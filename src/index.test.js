@@ -1,7 +1,5 @@
-// src/index.test.js
 import { describe, it, expect, beforeAll } from 'bun:test'
 import BunOpenAPI from './index.js'
-import { parse } from 'yaml'
 
 const simpleSpec = `
 openapi: 3.1.0
@@ -69,7 +67,7 @@ describe('@supershaneski/openapi', () => {
 
     // Register handlers
     api.register('getHello', async (req) => {
-      return new Response('world')
+      return new Response('Hello, world!')
     })
 
     api.register('getUser', async (req) => {
@@ -77,9 +75,7 @@ describe('@supershaneski/openapi', () => {
       return Response.json({ id: id, name: 'Lima' })
     })
 
-    let authCalled = false
     api.registerSecurity('apiKey', async (req, scopes) => {
-      authCalled = true
       const key = req.headers.get('x-api-key')
       return key === 'secret123'
     })
@@ -96,7 +92,7 @@ describe('@supershaneski/openapi', () => {
     })
     const res = await handler(req)
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('world')
+    expect(await res.text()).toBe('Hello, world!')
   })
 
   it('extracts path parameters', async () => {
@@ -136,13 +132,20 @@ describe('@supershaneski/openapi', () => {
   })
 
   it('returns 501 for unregistered operationId', async () => {
-    const handler = routes['/test']?.GET
-    const req = new Request('http://localhost/test', {
+    api.register('getHello', null) // unregister
+    const newRoutes = await api.routes()
+    const res = await newRoutes['/hello'].GET(new Request('http://localhost/hello', {
       headers: {
         'x-api-key': 'secret123'
       }
-    })
+    }))
+    expect(res.status).toBe(501) 
+  })
+
+  it('returns 401 even for unregistered operationId if security fails', async () => {
+    const handler = routes['/test']?.GET
+    const req = new Request('http://localhost/test') // Not sending required headers
     const res = await handler(req)
-    expect(res.status).toBe(501)
+    expect(res.status).toBe(401) 
   })
 })

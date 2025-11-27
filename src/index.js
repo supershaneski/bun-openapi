@@ -33,20 +33,28 @@ class BunOpenAPI {
         if (!operationId || typeof operationId !== "string") {
         throw new Error("operationId must be a string")
         }
-        if (typeof handler !== "function") {
-        throw new Error("handler must be a function")
+        if (handler !== null && typeof handler !== "function") {
+            throw new Error("handler must be a function or null")
         }
-        this.operations.set(operationId, handler)
+        if (handler === null) {
+            this.operations.delete(operationId)
+        } else {
+            this.operations.set(operationId, handler)
+        }
     }
 
     registerSecurity(schemeName, handler) {
         if (!schemeName || typeof schemeName !== "string") {
         throw new Error("schemeName must be a string")
         }
-        if (typeof handler !== "function") {
-        throw new Error("handler must be a function")
+        if (handler !== null && typeof handler !== "function") {
+            throw new Error("handler must be a function or null")
         }
-        this.securityHandlers.set(schemeName, handler)
+        if (handler === null) {
+            this.securityHandlers.delete(schemeName)
+        } else {
+            this.securityHandlers.set(schemeName, handler)
+        }
     }
 
     async routes() {
