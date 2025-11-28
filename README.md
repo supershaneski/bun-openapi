@@ -1,4 +1,4 @@
-# @supershaneski/bun-openapi
+# bun-openapi
 
 Lightweight OpenAPI router middleware for Bun.
 
