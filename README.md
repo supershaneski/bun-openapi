@@ -1,6 +1,6 @@
 # bun-openapi
 
-Lightweight OpenAPI router middleware for Bun.
+Lightweight [OpenAPI](https://swagger.io/docs/specification/v3_0/about/) router middleware for [Bun](https://bun.com/docs).
 
 ## Get Started
 
