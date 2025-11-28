@@ -16,7 +16,8 @@ import BunOpenAPI from '@supershaneski/openapi'
 
 const api = new BunOpenAPI({
   definition: './openapi.yaml',
-  //cors: { origin: 'https://yoursite.com' } // You can override the default CORS headers, if necessary
+  // You can override the default CORS headers, if necessary
+  //cors: { origin: 'https://yoursite.com' } 
 })
 
 // Endpoint handlers
