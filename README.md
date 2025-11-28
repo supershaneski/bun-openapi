@@ -1,4 +1,4 @@
-# @supershaneski/openapi
+# @supershaneski/bun-openapi
 
 Lightweight OpenAPI router middleware for Bun.
 
@@ -7,14 +7,14 @@ Lightweight OpenAPI router middleware for Bun.
 ### Installation
 
 ```sh
-# bun add @supershaneski/openapi
+# bun add @supershaneski/bun-openapi
 bun add git+https://github.com/supershaneski/bun-openapi.git
 ```
 
 ### Quick Start
 
 ```js
-import BunOpenAPI from '@supershaneski/openapi'
+import BunOpenAPI from '@supershaneski/bun-openapi'
 
 const api = new BunOpenAPI({
   // You will need to properly locate the path for your openapi yaml file
