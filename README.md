@@ -1,5 +1,10 @@
 # bun-openapi
 
+[![bun](https://img.shields.io/badge/bun-%2315292a.svg?logo=bun)](https://bun.sh)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![GitHub stars](https://img.shields.io/github/stars/supershaneski/bun-openapi.svg?style=social)](https://github.com/supershaneski/bun-openapi)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 Lightweight [OpenAPI](https://swagger.io/docs/specification/v3_0/about/) router middleware for [Bun](https://bun.com/docs).
 
 ## Get Started
