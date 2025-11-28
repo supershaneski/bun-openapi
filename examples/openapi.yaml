@@ -10,7 +10,7 @@ paths:
       responses:
         '200':
           description: OK
-  /users/:id:
+  /users/{id}:
     get:
       operationId: getUser
       parameters:
@@ -21,7 +21,7 @@ paths:
       responses:
         '200':
           description: OK
-  /products/:id:
+  /products/{id}:
     get:
       operationId: getProduct
       security: []

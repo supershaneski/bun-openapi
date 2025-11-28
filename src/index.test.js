@@ -19,7 +19,7 @@ paths:
       responses:
         '200':
           description: OK
-  /users/:id:
+  /users/{id}:
     get:
       operationId: getUser
       parameters:
