@@ -1,8 +1,7 @@
 {
   "name": "@supershaneski/bun-openapi",
   "version": "0.1.0",
-  "private": true,
-  "description": "Lightweight OpenAPI → Bun router.",
+  "description": "Lightweight OpenAPI router middleware for Bun.",
   "author": "supershaneski",
   "license": "MIT",
   "type": "module",
@@ -21,7 +20,7 @@
     "test": "bun test",
     "dev": "bun --watch run examples/basic.js"
   },
-  "files": ["src"],
+  "files": ["src", "package.json", "LICENSE", "README.md"],
   "dependencies": {
     "yaml": "^2.8.1"
   },
