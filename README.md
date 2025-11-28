@@ -11,6 +11,8 @@ Lightweight [OpenAPI](https://swagger.io/docs/specification/v3_0/about/) router 
 bun add git+https://github.com/supershaneski/bun-openapi.git
 ```
 
+Make sure to use this only in your **Bun** project.
+
 ### Quick Start
 
 ```js
