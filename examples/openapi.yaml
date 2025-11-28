@@ -21,6 +21,18 @@ paths:
       responses:
         '200':
           description: OK
+  /products/:id:
+    get:
+      operationId: getProduct
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
   /admin:
     post:
       operationId: createAdmin

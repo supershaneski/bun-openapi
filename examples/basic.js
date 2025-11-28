@@ -17,6 +17,11 @@ api.register('getUser', async (req) => {
   return Response.json({ status: 'success', created: Date.now(), data: { userId: id }})
 })
 
+api.register('getProduct', async (req) => {
+  const { id } = req.params
+  return Response.json({ status: 'success', created: Date.now(), data: { productId: id }})
+})
+
 api.registerSecurity('apiKey', async (req) => {
   const key = req.headers.get('x-api-key')
   return key === 'secret123' || false
@@ -24,12 +29,14 @@ api.registerSecurity('apiKey', async (req) => {
 
 const routes = await api.routes()
 
+const port = 3000
+
 Bun.serve({
   routes,
-  port: 3000,
-  fetch(req) {
+  port,
+  async fetch(req) {
     return new Response('Not Found', { status: 404 })
   }
 })
 
-console.log(`Server started and listening on http://localhost:3000`)
+console.log(`Server started and listening on http://localhost:${port}`)
