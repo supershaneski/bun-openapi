@@ -53,7 +53,7 @@ security:
   - apiKey: []
 `
 
-describe('@supershaneski/openapi', () => {
+describe('@supershaneski/bun-openapi', () => {
   let api
   let routes
 
