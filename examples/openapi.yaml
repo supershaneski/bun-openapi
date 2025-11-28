@@ -37,7 +37,7 @@ paths:
     post:
       operationId: createAdmin
       security:
-        - apiKey: []
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -52,5 +52,9 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 security:
   - apiKey: []
