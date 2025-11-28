@@ -24,7 +24,8 @@
   "dependencies": {
     "yaml": "^2.8.1"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "@types/node": "^20.0.0",
     "bun": ">=1.1.0"
   },
   "keywords": [
@@ -34,6 +35,7 @@
     "router",
     "api",
     "yaml",
+    "node",
     "backend"
   ],
   "repository": {
@@ -44,9 +46,6 @@
     "url": "https://github.com/supershaneski/bun-openapi/issues"
   },
   "homepage": "https://github.com/supershaneski/bun-openapi#readme",
-  "engines": {
-    "bun": ">=1.1.0"
-  },
   "publishConfig": {
     "access": "public"
   }
