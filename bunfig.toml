@@ -1,4 +1,0 @@
-# bunfig.toml
-# Configuration for @supershaneski/openapi
-[test]
-preload = ["./src"]
