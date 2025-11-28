@@ -2,19 +2,22 @@
 
 Lightweight OpenAPI router middleware for Bun.
 
-## Installation
+## Get Started
+
+### Installation
 
 ```sh
 # bun add @supershaneski/openapi
 bun add git+https://github.com/supershaneski/bun-openapi.git
 ```
 
-## Quick Start
+### Quick Start
 
 ```js
 import BunOpenAPI from '@supershaneski/openapi'
 
 const api = new BunOpenAPI({
+  // You will need to properly locate the path for your openapi yaml file
   definition: './openapi.yaml',
   // You can override the default CORS headers, if necessary
   //cors: { origin: 'https://yoursite.com' } 
