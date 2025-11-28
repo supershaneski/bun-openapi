@@ -1,4 +1,6 @@
 import { parse } from 'yaml'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 
 class BunOpenAPI {
     constructor({ definition, cors }) {
@@ -58,9 +60,25 @@ class BunOpenAPI {
     }
 
     async routes() {
-        const file = Bun.file(this.definition)
-        const text = await file.text()
-        const doc = parse(text)
+        let doc
+
+        if (typeof this.definition === 'string') {
+            const filePath = path.resolve(this.definition); // Resolve the path
+            try {
+                // Read the file asynchronously. 'utf8' ensures text decoding.
+                const text = await readFile(filePath, 'utf8');
+                doc = parse(text);
+            } catch (error) {
+                console.error(`Error reading or parsing OpenAPI definition file: ${filePath}`, error);
+                throw new Error(`Failed to load OpenAPI definition: ${error.message}`);
+            }
+        } else if (typeof this.definition === 'object' && this.definition !== null) {
+            // If the definition is passed as an object, use it directly
+            doc = this.definition;
+        } else {
+            throw new Error("Invalid definition provided. Must be a file path (string) or an OpenAPI object.");
+        }
+
         this.spec = doc
 
         const globalSecurity = doc.security || []
