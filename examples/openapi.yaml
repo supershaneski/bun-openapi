@@ -1,60 +1,528 @@
 openapi: 3.1.0
 info:
-  title: Test API
+  title: Sample API Server
   version: 1.0.0
+servers:
+  - url: http://localhost:3000
 paths:
-  /hello:
-    get:
-      operationId: getHello
-      security: []
-      responses:
-        '200':
-          description: OK
-  /users/{id}:
-    get:
-      operationId: getUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: OK
-  /products/{id}:
-    get:
-      operationId: getProduct
-      security: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: OK
-  /admin:
+  /api/login:
     post:
-      operationId: createAdmin
-      security:
-        - bearerAuth: []
+      summary: Login
+      operationId: login
+      security: []
+      tags:
+        - auth
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/logout:
+    post:
+      summary: Logout
+      operationId: logout
+      tags:
+        - auth
+      responses:
+        '204':
+          description: Logged out
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/refresh:
+    post:
+      summary: Refresh
+      operationId: refresh
+      tags:
+        - auth
+      security:
+        - RefreshCookieAuth: []
+        - CSRFCookieAuth: []
+        - CSRFHeaderAuth: []
+      responses:
+        '200':
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/profile:
+    post:
+      summary: Update logged-in user profile
+      operationId: updateProfile
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateProfileResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/todos:
+    get:
+      summary: Get todo list
+      operationId: getTodoList
+      tags:
+        - todo
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Todo list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTodoListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create new todo item
+      operationId: addTodo
+      tags:
+        - todo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTodoRequest'
       responses:
         '201':
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTodoResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/todos/{id}:
+    get:
+      summary: Get todo item
+      operationId: getTodo
+      tags:
+        - todo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Todo item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTodoResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete todo item
+      operationId: deleteTodo
+      tags:
+        - todo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /privacy:
+    get:
+      summary: Get privacy policy in markdown format
+      operationId: getPrivacy
+      tags:
+        - misc
+      security: []
+      responses:
+        '200':
+          description: Privacy policy text
+          content:
+            text/markdown:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+  /stream:
+    get:
+      summary: Streaming example using SSE
+      operationId: getStream
+      tags:
+        - misc
+      security: []
+      responses:
+        '200':
+          description: Text chunk events
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
-    apiKey:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: |
+        HTTP-only cookie containing the JWT access token
+        - Expires in 15 minutes
+    RefreshCookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: |
+        HTTP-only cookie containing the JWT refresh token
+        - Expires in 1 hour
+    CSRFCookieAuth:
+      type: apiKey
+      in: cookie
+      name: csrfToken
+      description: |
+        HTTP-only cookie containing the CSRF token
+        - Expires same as refresh cookie
+    CSRFHeaderAuth:
       type: apiKey
       in: header
-      name: X-API-Key
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      name: X-CSRF-Token
+      description: |
+        CSRF token attached in header
+        - Used when refreshing tokens
+        - Same as the CSRF token in Cookie
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        created:
+          description: Timestamp
+          type: integer
+          format: int64
+          example: 1759974176938
+        status:
+          type: string
+          enum: [error]
+        code:
+          type: string
+          example: INVALID_REQUEST
+        message:
+          type: string
+          example: Invalid request parameter
+      required:
+        - created
+        - status
+        - code
+        - message
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            image:
+              type: string
+              nullable: true
+              format: base64
+          required:
+            - name
+            - image
+      required:
+        - created
+        - status
+        - data
+    RefreshResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+      required:
+        - created
+        - status
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+          format: binary
+        removeImage:
+          type: boolean
+      required:
+        - name
+    UpdateProfileResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            image:
+              type: string
+              nullable: true
+              format: base64
+          required:
+            - name
+            - image
+      required:
+        - created
+        - status
+        - data
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+          format: date-time
+          example: 2025-01-15T17:00:00Z
+      required:
+        - id
+        - title
+        - date
+    GetTodoListResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Todo'
+      required:
+        - created
+        - status
+        - data
+    AddTodoRequest:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+    AddTodoResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+        data:
+          $ref: '#/components/schemas/Todo'
+      required:
+        - created
+        - status
+        - data
+    GetTodoResponse:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [success]
+        data:
+          $ref: '#/components/schemas/Todo'
+      required:
+        - created
+        - status
+        - data
 security:
-  - apiKey: []
+  - CookieAuth: []
+tags:
+  - name: auth
+    x-displayName: Authentication
+    description: Auth related endpoints
+  - name: user
+    x-displayName: User
+    description: User related endpoints
+  - name: todo
+    x-displayName: Todo
+    description: Todo related endpoints
+  - name: misc
+    x-displayName: Miscellaneous
+    description: Miscellaneous endpoints
