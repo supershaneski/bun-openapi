@@ -82,7 +82,7 @@ const api = new BunOpenAPI({
     // - JWT auth via HttpOnly cookies
     // - Double-submit CSRF protection (cookie + X-CSRF-Token header)
     // This requires an explicit origin and allowing the CSRF header.
-    origin: 'http://localhost:5174', // your own client ip address and port
+    //origin: 'http://localhost:5173', // your own client IP and port
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token',
   },
   strict: true,
@@ -425,6 +425,17 @@ api.register('getStream', async (req, c) => {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
+    }
+  })
+})
+
+api.register('clientApp', async (req, c) => {
+  const path = `${__dirname}/index.html`
+  const html = await Bun.file(path).text();
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html'
     }
   })
 })

@@ -288,7 +288,7 @@ paths:
                 type: string
         '500':
           description: Internal server error
-  /stream:
+  /api/stream:
     get:
       summary: Streaming example using SSE
       operationId: getStream
@@ -302,6 +302,23 @@ paths:
             text/event-stream:
               schema:
                 type: string
+        '500':
+          description: Internal server error
+  /app:
+    get:
+      summary: Sample client app
+      operationId: clientApp
+      tags:
+        - misc
+      security: []
+      responses:
+        '200':
+          description: Client app
+          content:
+            text/html:
+              schema:
+                type: string
+                description: HTML document
         '500':
           description: Internal server error
 components:
@@ -325,7 +342,7 @@ components:
       in: cookie
       name: csrfToken
       description: |
-        HTTP-only cookie containing the CSRF token
+        Cookie containing the CSRF token
         - Expires same as refresh cookie
     CSRFHeaderAuth:
       type: apiKey

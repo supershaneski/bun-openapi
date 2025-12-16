@@ -171,8 +171,8 @@ const server = Bun.serve({
 console.log(`Server started and listening on port ${server.port}`)
 ```
 
-Check the [examples](/examples/basic.js) directory for more usage patterns.
-
+See the [full-featured example](/examples/basic.js) for advanced patterns:
+**JWT** in **HttpOnly** cookies, refresh tokens, **CSRF** protection, file uploads, and **SSE streaming**.
 
 ## Roadmap
 

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo API Client Demo</title>
+</head>
+<body>
+<h1>Todo API Client</h1>
+<p>Status: <span id="status">Logged Out</span></p>
+<img id="pfp" style="width: 50px; height: 50px; object-fit: cover;">
+<p>User: <span id="userName"></span></p>
+
+<button id="loginBtn">Login (john/test123)</button>
+<button id="loginBtn2">Login (alice/qwerty123)</button>
+<button id="refreshBtn" disabled>Refresh Token</button>
+<button id="logoutBtn" disabled>Logout</button>
+<button id="profileBtn" disabled>Update Profile Pic</button>
+<button id="getTodosBtn" disabled>Get Todos</button>
+<button id="addTodoBtn" disabled>Add Todo</button>
+<button id="streamBtn" disabled>Streaming</button>
+
+<input id="fileInput" onChange="handleFile(event)" accept="image/*" type="file" style="display: none;" />
+
+<pre id="output"></pre>
+
+<script>
+const API_BASE = 'http://localhost:3000/api'
+let csrfToken = null
+let userName = ''
+//let profilePic = null
+
+const statusEl = document.getElementById('status')
+const userNameEl = document.getElementById('userName')
+const outputEl = document.getElementById('output')
+const profileEl = document.getElementById('pfp')
+
+const updateUI = (state) => {
+    userNameEl.textContent = userName
+    //profileEl.src = profilePic || ''
+    statusEl.textContent = state
+    outputEl.textContent = ''
+
+    const loggedIn = !!userName
+
+    document.getElementById('loginBtn').disabled = loggedIn
+    document.getElementById('loginBtn2').disabled = loggedIn
+    document.getElementById('logoutBtn').disabled = !loggedIn
+    document.getElementById('refreshBtn').disabled = !loggedIn
+    document.getElementById('profileBtn').disabled = !loggedIn
+    document.getElementById('getTodosBtn').disabled = !loggedIn
+    document.getElementById('addTodoBtn').disabled = !loggedIn
+    document.getElementById('streamBtn').disabled = !loggedIn
+
+}
+
+const getCsrfFromCookie = () => {
+    const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrfToken='))
+        ?.split('=')[1] || null
+    
+    csrfToken = token
+}
+
+// --- API Functions ---
+
+const handleLogin = async (login, password) => {
+    try {
+        const response = await fetch(`${API_BASE}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ login, password })
+        })
+
+        if (!response.ok) throw new Error(`Login failed: ${response.statusText}`)
+
+        const result = await response.json()
+        userName = result.data.name
+        //profilePic = result.data.image
+        profileEl.src = result.data.image
+        
+        getCsrfFromCookie()
+        updateUI('Logged In')
+        console.log("Login successful. CSRF Token:", csrfToken)
+    } catch (err) {
+        alert(err.message)
+        updateUI('Error')
+    }
+}
+
+const handleRefresh = async () => {
+    if (!csrfToken) {
+        alert("CSRF Token not found. Please log in first.")
+        return
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/refresh`, {
+            method: 'POST',
+            headers: {
+                // Attach CSRF Token for validation
+                'x-csrf-token': csrfToken
+            },
+            credentials: 'include'
+        })
+
+        if (!response.ok) throw new Error(`Refresh failed: ${response.statusText}`)
+
+        // If successful, a new csrfToken might be set.
+        document.getElementById('pfp').src = ''
+
+        getCsrfFromCookie() 
+        updateUI('Token Refreshed')
+        console.log("Token Refresh successful. New CSRF Token:", csrfToken)
+    } catch (err) {
+        alert(`Refresh error: ${err.message}. Please log in again.`)
+        updateUI('Logged Out')
+    }
+}
+
+const handleLogout = async () => {
+    await fetch(`${API_BASE}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+    })
+
+    userName = ''
+    csrfToken = null
+    //profilePic = null
+    profileEl.src = 'about:blank'
+    updateUI('Logged Out')
+    console.log("Logged out.")
+}
+
+const handleGetTodos = async () => {
+    try {
+        const response = await fetch(`${API_BASE}/todos?limit=5`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+
+        if (!response.ok) throw new Error(`Fetch failed: ${response.statusText}`)
+
+        const result = await response.json()
+        outputEl.textContent = JSON.stringify(result.data, null, 2)
+    } catch (err) {
+        alert(`Error fetching todos: ${err.message}`)
+        outputEl.textContent = `Error: ${err.message}`
+    }
+}
+
+const handleAddTodo = async () => {
+    try {
+        const newTodo = prompt('New task:', 'Buy coffee')
+        if (!newTodo) return
+
+        const response = await fetch(`${API_BASE}/todos`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: newTodo })
+        })
+
+        if (!response.ok) throw new Error(`Add Todo failed: ${response.statusText}`)
+
+        const result = await response.json()
+        outputEl.textContent = JSON.stringify(result.data, null, 2)
+
+    } catch (err) {
+        alert(`Error adding todo: ${err.message}`)
+        outputEl.textContent = `Error: ${err.message}`
+    }
+}
+
+const handleStreaming = async () => {
+    try {
+        outputEl.textContent = ''
+
+        const response = await fetch(`${API_BASE}/stream`)
+
+        if (!response.ok) throw new Error(`Streaming failed: ${response.statusText}`)
+
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            const raw = decoder.decode(value, { stream: true })
+            const chunk = raw.replace(/\n/g, '').replace('data: ', '')
+
+            outputEl.textContent = outputEl.textContent + chunk
+        }
+
+    } catch (err) {
+        alert(`Error: ${err.message}`)
+        outputEl.textContent = `Error: ${err.message}`
+    }
+}
+
+const handleProfile = () => {
+    document.getElementById('fileInput').click()
+}
+
+const handleFile = async (e) => {
+
+    console.log(e)
+
+    if(e.target.files.length === 0) return
+
+    try {
+        const name = userNameEl.textContent
+
+        const file = e.target.files[0]
+
+        const form = new FormData()
+        form.append('name', name)
+        form.append('image', file)
+
+        const response = await fetch(`${API_BASE}/profile`, {
+            method: 'POST',
+            credentials: 'include',
+            body: form
+        })
+
+        if (!response.ok) throw new Error(`Upload failed: ${response.statusText}`)
+
+        const result = await response.json()
+        outputEl.textContent = JSON.stringify(result.data, null, 2)
+
+        console.log(result.data)
+
+        profileEl.src = result.data.image
+        //profilePic = result.data.image
+
+    } catch(err) {
+        alert(`Error: ${err.message}`)
+        outputEl.textContent = `Error: ${err.message}`
+    }
+}
+
+// --- Event Listeners ---
+document.getElementById('loginBtn').addEventListener('click', () => handleLogin('john', 'test123'))
+document.getElementById('loginBtn2').addEventListener('click', () => handleLogin('alice', 'qwerty123'))
+document.getElementById('refreshBtn').addEventListener('click', handleRefresh)
+document.getElementById('logoutBtn').addEventListener('click', handleLogout)
+document.getElementById('profileBtn').addEventListener('click', handleProfile)
+document.getElementById('getTodosBtn').addEventListener('click', handleGetTodos)
+document.getElementById('addTodoBtn').addEventListener('click', handleAddTodo)
+document.getElementById('streamBtn').addEventListener('click', handleStreaming)
+
+// Initial setup
+updateUI('Logged Out')
+</script>
+</body>
+</html>
