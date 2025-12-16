@@ -1,6 +1,6 @@
 {
   "name": "@supershaneski/bun-openapi",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Lightweight OpenAPI router middleware for Bun.",
   "author": "supershaneski",
   "license": "MIT",
