@@ -1,8 +1,9 @@
-import { parse } from 'yaml'
-import { readFile } from 'node:fs/promises'
+//import { parse } from 'yaml' // replaced by swagger-parser
+//import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
+import SwaggerParser from '@apidevtools/swagger-parser'
 
 /**
  * @file This file contains the definition of the BunOpenAPI class, a middleware router for Bun.
@@ -194,8 +195,11 @@ class BunOpenAPI {
             const filePath = path.resolve(this.definition) // Resolve the path
             try {
                 // Read the file asynchronously. 'utf8' ensures text decoding.
-                const text = await readFile(filePath, 'utf8')
-                doc = parse(text)
+                //const text = await readFile(filePath, 'utf8')
+                //doc = parse(text)
+
+                // This should improve $ref support
+                doc = await SwaggerParser.dereference(filePath)
             } catch (error) {
                 console.error(`Error reading or parsing OpenAPI definition file: ${filePath}`, error)
                 throw new Error(`Failed to load OpenAPI definition: ${error.message}`)
